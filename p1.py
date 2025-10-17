@@ -29,21 +29,32 @@ def handle_request():
         url = attach.get("url")
         if name and url and url.startswith("data:"):
             header, encoded = url.split(",", 1)
-            ext = name.split(".")[-1]
             filename = f"{task}_{name}"
             with open(filename, "wb") as f:
                 f.write(base64.b64decode(encoded))
             saved_files.append(filename)
     
-    # 4️⃣ Prepare a minimal response
+    # 4️⃣ Create a minimal HTML app file
+    app_filename = f"{task}_index.html"
+    with open(app_filename, "w") as f:
+        f.write(f"""
+<!doctype html>
+<html>
+<head><title>{task}</title></head>
+<body>
+<h1>{brief}</h1>
+</body>
+</html>
+""")
+    
+    # 5️⃣ Prepare JSON response
     response = {
         "status": "ok",
         "message": f"Task {task} received from {email}",
         "round": round_index,
-        "nonce": nonce
+        "nonce": nonce,
+        "html_file": app_filename
     }
-    
-    # You can later add logic to generate apps or push to GitHub here
 
     return jsonify(response)
 
